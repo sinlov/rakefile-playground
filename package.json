@@ -1,0 +1,10 @@
+{
+  "name": "rakefile-playground",
+  "version": "1.0.0",
+  "description": "",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/sinlov/rakefile-playground.git"
+  }
+}
