@@ -1,0 +1,56 @@
+
+# frist
+require 'rake'
+Dir.chdir "."
+files = Rake::FileList["*.md"]
+puts "files # => [#{files}]" # => ["ch1.md", "temp.md", "ch3.md", "ch2.md", "~ch1.md"]
+
+files = Rake::FileList["*.md", "*.markdown"]
+puts "files # => [#{files}]" # => ["ch1.md", "temp.md", "ch3.md", "ch2.md", "~ch1.md", "ch4.markdown"]
+
+files = Rake::FileList["**/*.md", "**/*.markdown"]
+puts "files # => [#{files}]"
+
+files.exclude("~*")
+puts "files exclude # => [#{files}]"
+
+files.exclude(/^scratch\//)
+puts "files exclude scratch # => [#{files}]"
+
+files.exclude do |f|
+  `git ls-files #{f}`.empty?
+end
+
+puts "files exclude scratch and empty # => [#{files}]"
+
+files = Rake::FileList.new("**/*.md", "**/*.markdown") do |fl|
+  fl.exclude("~*")
+  fl.exclude(/^scratch\//)
+  fl.exclude do |f|
+    `git ls-files #{f}`.empty?
+  end
+end
+
+puts "files exclude sort # => [#{files}]"
+puts "files.ext(\".html\") # => [#{files.ext(".html")}]"
+
+
+source_files = Rake::FileList.new("**/*.md", "**/*.markdown") do |fl|
+  fl.exclude("~*")
+  fl.exclude(/^scratch\//)
+  fl.exclude do |f|
+    `git ls-files #{f}`.empty?
+  end
+end
+
+task :html => source_files.ext(".html")
+
+rule ".html" => ".md" do |t|
+  sh "pandoc -o #{t.name} #{t.source}"
+end
+
+rule ".html" => ".markdown" do |t|
+  sh "pandoc -o #{t.name} #{t.source}"
+end
+
+task :default => :html

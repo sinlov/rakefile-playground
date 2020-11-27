@@ -51,8 +51,17 @@ install:
 installAll: utils installGlobal install
 	@echo "=> install all finish"
 
+clean1Base:
+	cd ${ENV_ROOT}/1-base && rm *.html
+
 run1Base:
 	cd ${ENV_ROOT}/1-base && bundler exec rake
+
+clean2FileList:
+	cd ${ENV_ROOT}/2-file-lists && find . -name "*.html" | xargs rm -f
+
+run2FileList:
+	cd ${ENV_ROOT}/2-file-lists && bundler exec rake
 
 help:
 	@echo "ruby module makefile template"

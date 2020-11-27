@@ -2,9 +2,14 @@
   "name": "rakefile-playground",
   "version": "1.0.0",
   "description": "",
-  "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@github.com/sinlov/rakefile-playground.git"
-  }
+    "url": "git+https://github.com/sinlov/rakefile-playground.git"
+  },
+  "author": "",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/sinlov/rakefile-playground/issues"
+  },
+  "homepage": "https://github.com/sinlov/rakefile-playground#readme"
 }
