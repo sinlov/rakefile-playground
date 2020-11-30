@@ -72,6 +72,16 @@ run3Rules:
 run4PathMap:
 	cd ${ENV_ROOT}/4-path-map && bundler exec rake
 
+run5FileOperations:
+	cd ${ENV_ROOT}/5-file-operations && bundler exec rake
+
+clean5FileOperations:
+	cd ${ENV_ROOT}/5-file-operations && find . -name "*.html" | xargs rm -f
+	@if [ -d ${ENV_ROOT}/5-file-operations/outputs ]; \
+	then rm -rf ${ENV_ROOT}/5-file-operations/outputs && echo "~> cleaned ${ENV_ROOT}/5-file-operations/outputs"; \
+	else echo "~> has cleaned ${ENV_ROOT}/5-file-operations/outputs"; \
+	fi
+
 help:
 	@echo "ruby module makefile template"
 	@echo ""

@@ -40,6 +40,8 @@ end
 
 ## File-list
 
+`Rake::FileList.new()` 用来获取目标文件列表
+
 ```ruby
 source_files = Rake::FileList.new("**/*.md", "**/*.markdown") do |fl|
   fl.exclude("~*")
@@ -64,3 +66,64 @@ task :default => :html
 - 扫描当前源码目录中 md 和 markdown 后缀的文件
 - 排除 `~*` `/^scratch\//`, 以及 git ls-files 为空的文件
 - 生成对应 html 文件
+
+## rules
+
+```ruby
+require 'rake'
+# open trace rules faster than cli --trace
+# Rake.application.options.trace_rules = true
+
+task :default => :html
+
+source_files = Rake::FileList.new("**/*.md") do |fl|
+  fl.exclude("~*")
+  fl.exclude(/^scratch\//)
+  fl.exclude do |f|
+    `git ls-files #{f}`.empty?
+  end
+end
+
+task :html => source_files.ext(".html")
+rule ".html" => ".md" do |t|
+  sh "pandoc -o #{t.name} #{t.source}"
+end
+```
+- 扫描当前源码目录中 md 和 markdown 后缀的文件
+- 排除 `~*` `/^scratch\//`, 以及 git ls-files 为空的文件
+- 生成对应 html 文件
+- 特别的，rule `要求生成的每个对应文件，和生成源得一一对应`
+
+> 技巧： 设置 `Rake.application.options.trace_rules = true` 跟踪构建错误
+
+## PathMap
+
+Rake 修改了 Ruby 的 String 类以便让 FileList 支持特定相同方法
+故，Path 有额外的占位符用来快速操作
+
+- `%p` 完整路径
+- `%f` 没有目录的文件名
+- `%n` 没有目录和扩展名
+- `%d` 只有目录
+- `%x` 只有扩展名
+- `%X` 排除扩展名
+
+## 文件操作
+
+Rakefile 带有常用的文件操作，非常方便操作当前文件
+
+```ruby
+# 加入目录
+directory [folder]
+
+# 根据 Filemap 父目录路径创建文件夹，常用来生成文件夹
+mkdir_p t.name.pathmap("%d")
+
+# 删除目录
+rm_rf [folder]
+
+# 执行命令
+sh [cmd]
+```
+
+> 执行 rake 时使用 `-q` 参数来忽略 sh 执行日志

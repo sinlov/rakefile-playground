@@ -1,0 +1,36 @@
+require 'rake'
+require 'pathname'
+Dir.chdir Pathname.getwd()
+# puts "Dir.chdir => #{Pathname.getwd()}"
+# open trace rules faster than cli --trace
+# Rake.application.options.trace_rules = true
+
+SOURCE_FILES = Rake::FileList.new("sources/**/*.md", "sources/**/*.markdown") do |fl|
+  fl.exclude("**/~*")
+  fl.exclude(/^sources\/scratch\//)
+  fl.exclude do |f|
+    `git ls-files #{f}`.empty?
+  end
+end
+
+task :default => :html
+# puts "SOURCE_FILES => #{SOURCE_FILES}"
+task :html => SOURCE_FILES.pathmap("%{^sources/,outputs/}X.html")
+
+directory "outputs"
+
+rule ".html" => [->(f){source_for_html(f)}, "outputs"] do |t|
+  # puts "do => t.name.pathmap(\"%d\") #{t.name.pathmap("%d")}"
+  mkdir_p t.name.pathmap("%d")
+  sh "pandoc -o #{t.name} #{t.source}"
+end
+
+def source_for_html(html_file)
+  SOURCE_FILES.detect{|f|
+    f.ext('') == html_file.pathmap("%{^outputs/,sources/}X")
+  }
+end
+
+task :clean do
+  rm_rf "outputs"
+end
