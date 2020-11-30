@@ -46,4 +46,26 @@ Tasks: TOP => default => html
 (See full trace by running task with --trace)
 ```
 
-- 日志报告 ch4.html 实际上是要构建输出的文件，但任务将其理解为一个 task
+- 日志报告 ch4.html 实际上是要构建输出的文件，但任务将其理解为必须要一个明确的输入 ch4.md， 但是这个文件夹下是一个 ch4.markdown
+
+> 因为 Rake 修改了 Ruby 的 String 类以便让 FileList 支持特定相同方法，
+
+定义一个函数
+
+```ruby
+def source_for_html(html_file)
+  SOURCE_FILES.detect{|f| f.ext('') == html_file.ext('')}
+end
+```
+
+这个函数目的是删除文件扩展名，然后通过 lambda 函数调用
+
+```ruby
+rule ".html" => ->(f){source_for_html(f)} do |t|
+  sh "pandoc -o #{t.name} #{t.source}"
+end
+```
+
+调用时，把目标文件的名称传递给作为前提条件提供的 lambda
+通过这个 lambda 的返回值，检查其是否与现有文件匹配
+并认为该规则是匹配的，并继续执行关联的代码，这样就支持了不同后缀文件，也可用通过 rule 构建
