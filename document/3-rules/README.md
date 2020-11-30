@@ -69,3 +69,48 @@ end
 调用时，把目标文件的名称传递给作为前提条件提供的 lambda
 通过这个 lambda 的返回值，检查其是否与现有文件匹配
 并认为该规则是匹配的，并继续执行关联的代码，这样就支持了不同后缀文件，也可用通过 rule 构建
+
+### 第二次运行
+
+```ruby
+require 'rake'
+# open trace rules faster than cli --trace
+Rake.application.options.trace_rules = true
+
+task :default => :html
+
+SOURCE_FILES = Rake::FileList.new("**/*.md", "**/*.markdown") do |fl|
+  fl.exclude("~*")
+  fl.exclude(/^scratch\//)
+  fl.exclude do |f|
+    `git ls-files #{f}`.empty?
+  end
+end
+
+def source_for_html(html_file)
+  SOURCE_FILES.detect{|f| f.ext('') == html_file.ext('')}
+end
+
+rule ".html" => ->(f){source_for_html(f)} do |t|
+  sh "pandoc -o #{t.name} #{t.source}"
+end
+
+task :html => SOURCE_FILES.ext(".html")
+```
+
+输出
+
+```bash
+Attempting Rule ch1.html => ch1.md
+(ch1.html => ch1.md ... EXIST)
+Attempting Rule ch2.html => ch2.md
+(ch2.html => ch2.md ... EXIST)
+Attempting Rule ch3.html => ch3.md
+(ch3.html => ch3.md ... EXIST)
+Attempting Rule subdir/appendix.html => subdir/appendix.md
+(subdir/appendix.html => subdir/appendix.md ... EXIST)
+Attempting Rule temp.html => temp.md
+(temp.html => temp.md ... EXIST)
+Attempting Rule ch4.html => ch4.markdown
+(ch4.html => ch4.markdown ... EXIST)
+```

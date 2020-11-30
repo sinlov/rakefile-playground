@@ -1,0 +1,70 @@
+require 'rake'
+require 'pathname'
+Dir.chdir Pathname.getwd()
+# puts "Dir.chdir => #{Pathname.getwd()}"
+
+SOURCE_FILES = Rake::FileList.new("**/*.md", "**/*.markdown") do |fl|
+  fl.exclude("~*")
+  fl.exclude(/^scratch\//)
+  fl.exclude do |f|
+    `git ls-files #{f}`.empty?
+  end
+end
+
+puts "SOURCE_FILES => #{SOURCE_FILES}"
+# SOURCE_FILES => ch1.md ch2.md ch3.md subdir/appendix.md temp.md ch4.markdown
+
+puts "SOURCE_FILES.ext('html') => #{SOURCE_FILES.ext('html')}"
+# SOURCE_FILES.ext('html') => ch1.html ch2.html ch3.html subdir/appendix.html temp.html ch4.html
+
+puts "SOURCE_FILES.pathmap(\"%p\") => #{SOURCE_FILES.pathmap("%p")}"
+# SOURCE_FILES.pathmap("%p") => ch1.md ch2.md ch3.md subdir/appendix.md temp.md ch4.markdown
+
+puts "SOURCE_FILES.pathmap(\"%f\") => #{SOURCE_FILES.pathmap("%f")}"
+# SOURCE_FILES.pathmap("%f") => ch1.md ch2.md ch3.md appendix.md temp.md ch4.markdown
+
+puts "SOURCE_FILES.pathmap(\"%n\") => #{SOURCE_FILES.pathmap("%n")}"
+# SOURCE_FILES.pathmap("%n") => ch1 ch2 ch3 appendix temp ch4
+
+puts "SOURCE_FILES.pathmap(\"%d\") => #{SOURCE_FILES.pathmap("%d")}"
+# SOURCE_FILES.pathmap("%d") => . . . subdir . .
+
+puts "SOURCE_FILES.pathmap(\"%x\") => #{SOURCE_FILES.pathmap("%x")}"
+# SOURCE_FILES.pathmap("%x") => .md .md .md .md .md .markdown
+
+puts "SOURCE_FILES.pathmap(\"%X\") => #{SOURCE_FILES.pathmap("%X")}"
+# SOURCE_FILES.pathmap("%X") => ch1 ch2 ch3 subdir/appendix temp ch4
+
+load_paths = FileList["mylibs", "yourlibs", "sharedlibs"]
+ruby_args  = load_paths.pathmap("-I%p")
+command    = "ruby #{ruby_args} myscript.rb"
+puts "command => #{command}"
+# command => ruby -Imylibs -Iyourlibs -Isharedlibs myscript.rb
+
+puts "load_paths.to_s => #{load_paths.to_s}"
+# load_paths.to_s => mylibs yourlibs sharedlibs
+
+puts "load_paths.to_a.to_s => #{load_paths.to_a.to_s}"
+# load_paths.to_a.to_s => ["mylibs", "yourlibs", "sharedlibs"]
+
+SOURCE_FOLDER_FILES = Rake::FileList.new("sources/**/*.md", "sources/**/*.markdown")
+
+puts "SOURCE_FOLDER_FILES => #{SOURCE_FOLDER_FILES}"
+# SOURCE_FOLDER_FILES => sources/ch1.md sources/ch2.md sources/ch3.md sources/subdir/appendix.md sources/temp.md sources/~ch1.md sources/ch4.markdown
+
+OUTPUT_FILES = SOURCE_FOLDER_FILES.pathmap("%{^sources/,outputs/}X.html")
+puts "OUTPUT_FILES => #{OUTPUT_FILES}"
+# OUTPUT_FILES => outputs/ch1.html outputs/ch2.html outputs/ch3.html outputs/subdir/appendix.html outputs/temp.html outputs/~ch1.html outputs/ch4.html
+
+f = OUTPUT_FILES[3]
+
+puts "f => #{f}"
+# f => outputs/subdir/appendix.html
+cmd = "mkdir -p #{f.pathmap('%d')}"
+puts "cmd => #{cmd}"
+# cmd => mkdir -p outputs/subdir
+
+task :default do |t|
+  puts "=> task #{t.name}"
+  puts "this is demo"
+end
