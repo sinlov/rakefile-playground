@@ -63,6 +63,12 @@ clean2FileList:
 run2FileList:
 	cd ${ENV_ROOT}/2-file-lists && bundler exec rake
 
+clean3Rules:
+	cd ${ENV_ROOT}/3-rules && find . -name "*.html" | xargs rm -f
+
+run3Rules:
+	cd ${ENV_ROOT}/3-rules && bundler exec rake
+
 help:
 	@echo "ruby module makefile template"
 	@echo ""
@@ -82,4 +88,6 @@ help:
 	@echo "$$ make install             ~> install project"
 	@echo "$$ make installAll          ~> install all include global utils"
 	@echo " run demo as"
-	@echo "$$ make run1Base             ~> run 1-base"
+	@echo "$$ make run1Base            ~> run 1-base"
+	@echo "$$ make run2FileList        ~> run 2-file-lists"
+	@echo "$$ make run3Rules           ~> run 3-rules"

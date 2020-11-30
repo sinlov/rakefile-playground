@@ -1,7 +1,23 @@
 require 'rake'
-Dir.chdir "."
+# open trace rules faster than cli --trace
+Rake.application.options.trace_rules = true
 
-source_files = Rake::FileList.new("**/*.md", "**/*.markdown") do |fl|
+task :default => :html
+
+# source_files = Rake::FileList.new("**/*.md", "**/*.markdown") do |fl|
+#   fl.exclude("~*")
+#   fl.exclude(/^scratch\//)
+#   fl.exclude do |f|
+#     `git ls-files #{f}`.empty?
+#   end
+# end
+
+# task :html => source_files.ext(".html")
+# rule ".html" => ".md" do |t|
+#   sh "pandoc -o #{t.name} #{t.source}"
+# end
+
+SOURCE_FILES = Rake::FileList.new("**/*.md", "**/*.markdown") do |fl|
   fl.exclude("~*")
   fl.exclude(/^scratch\//)
   fl.exclude do |f|
@@ -9,16 +25,12 @@ source_files = Rake::FileList.new("**/*.md", "**/*.markdown") do |fl|
   end
 end
 
-puts "source_files: #{source_files}"
+def source_for_html(html_file)
+  SOURCE_FILES.detect{|f| f.ext('') == html_file.ext('')}
+end
 
-task :html => source_files.ext(".html")
-
-rule ".html" => ".md" do |t|
+rule ".html" => ->(f){source_for_html(f)} do |t|
   sh "pandoc -o #{t.name} #{t.source}"
 end
 
-rule ".html" => ".markdown" do |t|
-  sh "pandoc -o #{t.name} #{t.source}"
-end
-
-task :default => :html
+task :html => SOURCE_FILES.ext(".html")

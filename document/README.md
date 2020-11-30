@@ -39,3 +39,28 @@ end
 将对应 markdown 通过 pandoc 编译为 html 文件, 并且如果已经编译过文件则不在编译
 
 ## File-list
+
+```ruby
+source_files = Rake::FileList.new("**/*.md", "**/*.markdown") do |fl|
+  fl.exclude("~*")
+  fl.exclude(/^scratch\//)
+  fl.exclude do |f|
+    `git ls-files #{f}`.empty?
+  end
+end
+
+task :html => source_files.ext(".html")
+
+rule ".html" => ".md" do |t|
+  sh "pandoc -o #{t.name} #{t.source}"
+end
+
+rule ".html" => ".markdown" do |t|
+  sh "pandoc -o #{t.name} #{t.source}"
+end
+
+task :default => :html
+```
+- 扫描当前源码目录中 md 和 markdown 后缀的文件
+- 排除 `~*` `/^scratch\//`, 以及 git ls-files 为空的文件
+- 生成对应 html 文件
