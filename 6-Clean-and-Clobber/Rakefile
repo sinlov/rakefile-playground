@@ -1,0 +1,40 @@
+require 'rake'
+require 'rake/clean'
+
+SOURCE_FILES = Rake::FileList.new("**/*.md", "**/*.markdown") do |fl|
+  fl.exclude("~*")
+  fl.exclude(/^scratch\//)
+  fl.exclude do |f|
+    `git ls-files #{f}`.empty?
+  end
+end
+
+task :default => ["book.epub", "book.mobi"]
+task :html => SOURCE_FILES.ext(".html")
+
+rule ".html" => ->(f){source_for_html(f)} do |t|
+  sh "pandoc -o #{t.name} #{t.source}"
+end
+
+file "book.html" => SOURCE_FILES.ext(".html") do |t|
+  chapters   = FileList["**/ch*.html"]
+  backmatter = FileList["backmatter/*.html"]
+  sh "cat #{chapters} #{backmatter} > #{t.name}"
+end
+
+file "book.epub" => "book.html" do |t|
+  sh "ebook-convert book.html #{t.name}"
+end
+CLOBBER << "book.epub"
+
+file "book.mobi" => "book.epub" do |t|
+  sh "kindlegen book.epub -o #{t.name}"
+end
+CLOBBER << "book.mobi"
+
+def source_for_html(html_file)
+  SOURCE_FILES.detect{|f| f.ext('') == html_file.ext('')}
+end
+
+CLEAN.include(SOURCE_FILES.ext(".html"))
+CLEAN.include("book.html")

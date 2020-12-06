@@ -127,3 +127,30 @@ sh [cmd]
 ```
 
 > 执行 rake 时使用 `-q` 参数来忽略 sh 执行日志
+
+## 清理构建
+
+Rake 提供默认文件清理任务 `rake clean` 此任务使用 `CLEAN.include` 来导入需要清理的文件列表
+
+```ruby
+# 必须引入
+require 'rake/clean'
+
+CLEAN.include(SOURCE_FILES.ext(".html"))
+CLEAN.include("book.epub")
+```
+
+Rake 提供文件清理任务 `rake clobber`， 此任务只能导入文件列表到 `CLOBBER` 这个数组
+`clobber` 任务的清理目标视为最终生产目标，而 clean 任务为情理构建中间产物
+
+```ruby
+# 必须引入
+require 'rake/clean'
+
+file "book.epub"
+
+CLOBBER << "book.epub"
+
+file "book.mobi"
+CLOBBER << "book.mobi"
+```

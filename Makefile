@@ -82,6 +82,13 @@ clean5FileOperations:
 	else echo "~> has cleaned ${ENV_ROOT}/5-file-operations/outputs"; \
 	fi
 
+run6CleanAndClobber:
+	cd ${ENV_ROOT}/6-Clean-and-Clobber && bundler exec rake
+
+clean6CleanAndClobber:
+	cd ${ENV_ROOT}/6-Clean-and-Clobber && bundler exec rake -T
+	cd ${ENV_ROOT}/6-Clean-and-Clobber && bundler exec rake clobber clean
+
 help:
 	@echo "ruby module makefile template"
 	@echo ""
