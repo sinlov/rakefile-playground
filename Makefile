@@ -44,6 +44,7 @@ cleanAll: cleanGemCache
 
 installGlobal:
 	gem install --user-install bundler
+	# gem install --user-install pygmentize
 
 install:
 	bundler install
@@ -89,6 +90,9 @@ clean6CleanAndClobber:
 	cd ${ENV_ROOT}/6-Clean-and-Clobber && bundler exec rake -T
 	cd ${ENV_ROOT}/6-Clean-and-Clobber && bundler exec rake clobber clean
 
+run7MultiTask:
+	cd ${ENV_ROOT}/7-MultiTask && bundler exec rake
+
 help:
 	@echo "ruby module makefile template"
 	@echo ""
@@ -112,3 +116,6 @@ help:
 	@echo "$$ make run2FileList        ~> run ${ENV_ROOT}/2-file-lists"
 	@echo "$$ make run3Rules           ~> run ${ENV_ROOT}/3-rules"
 	@echo "$$ make run4PathMap         ~> run ${ENV_ROOT}/4-path-map"
+	@echo "$$ make run5FileOperations  ~> run ${ENV_ROOT}/5-file-operations"
+	@echo "$$ make run6CleanAndClobber ~> run ${ENV_ROOT}/6-Clean-and-Clobber"
+	@echo "$$ make run7MultiTask       ~> run ${ENV_ROOT}/7-MultiTask"

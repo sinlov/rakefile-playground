@@ -1,3 +1,5 @@
+[![ruby-macOS](https://github.com/sinlov/rakefile-playground/workflows/ruby-macOS/badge.svg?branch=main)](https://github.com/sinlov/rakefile-playground/actions)
+
 # rakfile playground
 
   you must install to run
