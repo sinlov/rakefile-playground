@@ -154,3 +154,29 @@ CLOBBER << "book.epub"
 file "book.mobi"
 CLOBBER << "book.mobi"
 ```
+
+当然也可以粗暴的设置任务，删除构建文件夹
+
+```ruby
+task :cleanOutPuts do
+  rm_rf "outputs"
+end
+```
+
+## 多核构建
+
+默认情况下，Rake 是单核构建的，如果想用到多核构建，把 `task` 换成 `multitask` 比如
+
+```ruby
+# task :gen_html => GEN_FILES
+multitask :gen_html => GEN_FILES
+```
+
+如果不想改构建代码，也想用到多核效果，可以在执行指定CPU核数来开启 `-j [cpu]`
+
+```bash
+# single
+$ rake
+# multi
+$ rake -j 4
+```
