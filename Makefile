@@ -91,7 +91,12 @@ clean6CleanAndClobber:
 	cd ${ENV_ROOT}/6-Clean-and-Clobber && bundler exec rake clobber clean
 
 run7MultiTask:
-	cd ${ENV_ROOT}/7-MultiTask && bundler exec rake
+	cd ${ENV_ROOT}/7-MultiTask && \
+	bundler exec rake -f single-Rakefile.rb clean && \
+	time bundler exec rake -f single-Rakefile.rb && \
+	bundler exec rake -f multi-Rakefile.rb clean && \
+	time bundler exec rake -f multi-Rakefile.rb && \
+	bundler exec rake -f single-Rakefile.rb clean
 
 help:
 	@echo "ruby module makefile template"

@@ -17,11 +17,14 @@ task :default => :gen_html
 GEN_FILES = SOURCE_FILES.pathmap("%{^sources/,outputs/}X.html")
 # task :html_path => SOURCE_FILES.pathmap("%{^sources/,outputs/}X.html")
 
-OUT_FILES = FileList["outputs/*"]
+
+OUT_FILES = Rake::FileList.new("outputs/**/**") do |fl|
+  fl.exclude("~*")
+end
 OUT_HTML = OUT_FILES.ext(".html")
 CLEAN.include(OUT_HTML)
 
-task :gen_html => GEN_FILES
+# task :gen_html => GEN_FILES
 multitask :gen_html => GEN_FILES
 
 directory "outputs"

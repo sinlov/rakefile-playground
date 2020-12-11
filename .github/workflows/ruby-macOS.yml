@@ -36,4 +36,5 @@ jobs:
       run: make run1Base
     - name: Run clean1Base
       run: make clean1Base
-      
+    - name: Run run7MultiTask
+      run: make run7MultiTask

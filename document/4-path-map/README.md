@@ -1,6 +1,6 @@
 ## run as cli
 
-### 完整输出为
+### full out
 
 ```bash
 $ rake
