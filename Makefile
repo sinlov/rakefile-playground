@@ -7,6 +7,7 @@ ENV_DIST_VERSION := 1.0.0
 ENV_PROJECT_NAME=rakefile-playground
 
 ENV_ROOT ?= $(shell pwd)
+ENV_PHYSICALCPU_MAX ?= $(shell sysctl -N -a | grep hw.physicalcpu_max | xargs sysctl -e | cut -c 20- )
 
 utils:
 	npm install -g commitizen cz-conventional-changelog conventional-changelog-cli
@@ -96,7 +97,8 @@ run7MultiTask:
 	time bundler exec rake -f single-Rakefile.rb && \
 	bundler exec rake -f multi-Rakefile.rb clean && \
 	time bundler exec rake -f multi-Rakefile.rb && \
-	bundler exec rake -f single-Rakefile.rb clean
+	bundler exec rake -f multi-Rakefile.rb clean && \
+	time bundler exec rake -f multi-Rakefile.rb -j ${ENV_PHYSICALCPU_MAX}
 
 help:
 	@echo "ruby module makefile template"
