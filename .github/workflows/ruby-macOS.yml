@@ -29,7 +29,10 @@ jobs:
         ruby-version: 2.7.2
     - name: Install Tools
       run: |
-       brew install pandoc
+       which pandoc
+       if [[ $? -ne 0 ]]; then
+         brew install pandoc
+       fi
     - name: Install dependencies
       run: make install
     - name: Run run1Base

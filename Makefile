@@ -94,10 +94,16 @@ clean6CleanAndClobber:
 run7MultiTask:
 	cd ${ENV_ROOT}/7-MultiTask && \
 	bundler exec rake -f single-Rakefile.rb clean && \
+	echo "\n=> run: rake -f single-Rakefile.rb" && \
 	time bundler exec rake -f single-Rakefile.rb && \
 	bundler exec rake -f multi-Rakefile.rb clean && \
+	echo "\n=> run: rake -f multi-Rakefile.rb" && \
 	time bundler exec rake -f multi-Rakefile.rb && \
+	bundler exec rake -f single-Rakefile.rb clean && \
+	echo "\n=> run: rake -f single-Rakefile.rb -j ${ENV_PHYSICALCPU_MAX}" && \
+	time bundler exec rake -f single-Rakefile.rb -j ${ENV_PHYSICALCPU_MAX} && \
 	bundler exec rake -f multi-Rakefile.rb clean && \
+	echo "\n=> run: rake -f multi-Rakefile.rb -j ${ENV_PHYSICALCPU_MAX}" && \
 	time bundler exec rake -f multi-Rakefile.rb -j ${ENV_PHYSICALCPU_MAX}
 
 help:
