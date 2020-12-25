@@ -1,0 +1,7 @@
+namespace :group do
+  namespace :Innergroup do
+    task :gen do
+    end
+  end
+  task :all => ["Innergroup:gen"]
+end

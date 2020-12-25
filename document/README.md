@@ -1,21 +1,50 @@
-[TOC]
+# Rake 快速教程
 
-# 什么是 Rakefile
+<!-- TOC -->
+
+- [Rake 快速教程](#rake-快速教程)
+  - [什么是 Rakefile](#什么是-rakefile)
+  - [Rake 常用命令](#rake-常用命令)
+  - [Rakefile 的基础用法](#rakefile-的基础用法)
+  - [File-list](#file-list)
+  - [rules](#rules)
+  - [PathMap](#pathmap)
+  - [文件操作](#文件操作)
+  - [清理构建](#清理构建)
+  - [多核构建](#多核构建)
+  - [构建依赖](#构建依赖)
+
+<!-- /TOC -->
+
+## 什么是 Rakefile
 
 - Rakefile就是使用Ruby语法的 Makefile, 对应make的工具就是 rake，对应仓库在 [https://github.com/ruby/rake](https://github.com/ruby/rake)
 - Rakefile 在 ruby 构建时充当 task 制定，依赖，执行的媒介
 - 很多框架，比如 [Ruby on Rails](https://github.com/rails/rails) 数据库的初始化, 内容初始化, 删除 ,测试 等等都是 Rakefile 在操作
+- 默认情况下，`rake` 命令会执行当前目录下的 `Rakefile`
 
-# Rakefile 的语法
+## Rake 常用命令
 
-本质上，Rakefile 还是 ruby 脚本，那么肯定包含 ruby 语法
+```bash
+# 打印 Rakefile 所有的任务列表
+$ rake -T
+# 打印 Rakefile 所有的任务依赖关系
+$ rake -P
+# 打印调试信息 Rakefile
+$ rake -t
+```
+
+## Rakefile 的基础用法
+
+本质上，Rakefile 还是 ruby 脚本，那么肯定包含 ruby 语法，比如打印日志用 `puts`
+
 Rakefile 在此基础上分几个基本的build规则
-- 任务:  task 默认任务为 default，使用 task :[name] do end 来定义一个 name 的任务
-- 任务描述：desc 对任务进行描述
-- 命名空间: namespace 一般用于区分任务组
-- 调用任务: invoke 调用任务
+- 任务:  `task` 默认任务为 default，使用 task :[name] do end 来定义一个 name 的任务
+- 任务描述：`desc` 对任务进行描述
+- 命名空间: `namespace` 一般用于区分任务组
+- 调用任务: `invoke` 调用任务
 
-## 简单实例
+简单实例
 
 ```ruby
 task default: %w[test]
@@ -24,7 +53,7 @@ task :test do
   ruby "test/unittest.rb"
 end
 ```
-表示为 默认任务使用 test 覆盖，test 任务内容为运行 `ruby "test/unittest.rb"`
+表示为: 默认任务使用 `test` 任务覆盖，test 任务内容为运行 `ruby "test/unittest.rb"`
 
 
 ```ruby
@@ -36,7 +65,7 @@ rule ".html" => ".md" do |t|
   sh "pandoc -o #{t.name} #{t.source}"
 end
 ```
-将对应 markdown 通过 pandoc 编译为 html 文件, 并且如果已经编译过文件则不在编译
+表示为: 将对应 markdown 通过 pandoc 编译为 html 文件, 并且如果已经编译过文件则不在编译
 
 ## File-list
 
@@ -180,3 +209,32 @@ $ rake
 # multi
 $ rake -j 4
 ```
+
+## 构建依赖
+
+针对不同任务，可以做不同的依赖，最常用 namespace 来分割不同的任务
+
+```ruby
+namespace :group do
+  namespace :Innergroup do
+    task :gen do
+    end
+  end
+  task :all => ["Innergroup:gen"]
+end
+```
+
+通过简单的 `=>` 来指定依赖关系
+
+打印依赖关系为
+
+```bash
+$ rake -P
+rake group:Innergroup:gen
+rake group:all
+    Innergroup:gen
+```
+
+这样就可以减少重复任务编写，提高效率
+
+> 注意， 使用了 namespace 分配的任务，那么对 CLOBBER 清理来说，直接作用域就会失效，那么得根据实际情况修改清理任务

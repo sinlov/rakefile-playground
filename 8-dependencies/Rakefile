@@ -1,0 +1,105 @@
+require 'rake'
+require 'pathname'
+require 'rake/clean'
+
+Dir.chdir Pathname.getwd()
+
+SOURCE_FILES = Rake::FileList.new("sources/**/*.md", "sources/**/*.markdown") do |fl|
+  fl.exclude("**/~*")
+  fl.exclude(/^sources\/scratch\//)
+  fl.exclude do |f|
+    `git ls-files #{f}`.empty?
+  end
+end
+# puts "SOURCE_FILES => #{SOURCE_FILES}"
+# RES_FILES = SOURCE_FILES.pathmap("%{^sources/,sources/}X.md")
+RES_FILES = SOURCE_FILES.pathmap("%p")
+# puts "RES_FILES => #{RES_FILES}"
+
+def source_for_html(html_file)
+  SOURCE_FILES.detect{|f| f.ext('') == html_file.ext('')}
+end
+
+namespace :groupOne do |ns|
+  # desc "group one, pandoc to folder outputs/one/"
+  groupOne_folder = File.join("outputs", "one")
+
+  namespace :one do
+    OUT_FOLDER_ONE = File.join(groupOne_folder, "one")
+    desc "group one, pandoc to folder #{OUT_FOLDER_ONE}"
+    task :gen do |t|
+      puts "task [ #{t.name} ] run"
+      GEN_FILES = SOURCE_FILES.pathmap("%{^sources/,#{OUT_FOLDER_ONE}/}X.html")
+      each_code = 0
+      GEN_FILES.each do |t|
+        mkdir_p t.pathmap("%d")
+        res = RES_FILES[each_code]
+        if File::exists?(res)
+          sh "pandoc -o #{t.pathmap("%p")} #{RES_FILES[each_code]}"
+          # CLOBBER << t.pathmap("%p")
+        end
+        each_code += 1
+      end
+    end
+  end
+
+  namespace :two do
+    OUT_FOLDER_TWO = File.join(groupOne_folder, "two")
+    desc "group one, pandoc to folder #{OUT_FOLDER_TWO}"
+    task :gen do
+      GEN_FILES = SOURCE_FILES.pathmap("%{^sources/,#{OUT_FOLDER_TWO}/}X.html")
+      each_code = 0
+      GEN_FILES.each do |t|
+        mkdir_p t.pathmap("%d")
+        res = RES_FILES[each_code]
+        if File::exists?(res)
+          sh "pandoc -o #{t.pathmap("%p")} #{RES_FILES[each_code]}"
+          # CLOBBER << t.pathmap("%p")
+        end
+        each_code += 1
+      end
+    end
+  end
+
+  desc "do this group #{ns.scope.to_s.sub('LL', '')} all gen task"
+  task :genAll => ["one:gen", "two:gen"]
+end
+
+namespace :groupTwo do
+  # desc "group one, pandoc to folder outputs/one/"
+  groupTwo_folder = File.join("outputs", "two")
+
+  desc "group two, pandoc to folder #{groupTwo_folder}"
+  task :gen do |t|
+    puts "task [ #{t.name} ] run"
+    GEN_FILES = SOURCE_FILES.pathmap("%{^sources/,#{groupTwo_folder}/}X.html")
+    each_code = 0
+    GEN_FILES.each do |t|
+      mkdir_p t.pathmap("%d")
+      res = RES_FILES[each_code]
+      if File::exists?(res)
+        sh "pandoc -o #{t.pathmap("%p")} #{RES_FILES[each_code]}"
+      end
+      each_code += 1
+    end
+  end
+end
+
+desc "clean out folder: outputs"
+task :cleanOut do
+  rm_rf "outputs"
+end
+
+def msg(text)
+  puts " -- msg: #{text}"
+end
+
+out_files = Rake::FileList.new("**/*.html", "**/*.mhtml") do |fl|
+  fl.exclude("~*")
+  fl.exclude(/^scratch\//)
+  # fl.exclude do |f|
+  #   `git ls-files #{f}`.empty?
+  # end
+end
+# msg out_files.ext(".html")
+CLEAN.include(out_files.ext(".html"))
