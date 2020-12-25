@@ -1,7 +1,51 @@
-namespace :group do
-  namespace :Innergroup do
-    task :gen do
-    end
+require 'rake'
+require 'rake/clean'
+require 'pathname'
+Dir.chdir Pathname.getwd()
+
+DIST_PATH=File.join(Pathname.getwd(), 'dist') # set dist path
+
+desc "default task"
+task :default => :html # set default task
+
+source_files = Rake::FileList.new("**/*.md", "**/*.markdown") do |fl|
+  fl.exclude("~*")
+  fl.exclude(/^scratch\//)
+  fl.exclude do |f|
+    `git ls-files #{f}`.empty? # must git add file
   end
-  task :all => ["Innergroup:gen"]
+end
+
+# puts "html in #{source_files.ext(".md")}"
+desc "html task"
+task :html => source_files.ext(".html")
+# multitask :html => source_files.ext(".html") # do multitask
+
+rule ".html" => ".md" do |t|
+  out_folder=File.join(Pathname.getwd(), 'dist')
+  if not File.directory?(DIST_PATH)
+    mkdir_p DIST_PATH
+  end
+  sh "file #{t.source}"
+  out_file=File.join(DIST_PATH, t.name)
+  msg "do out: #{out_file} in: #{t.source}"
+end
+
+desc "clean out folder: outputs"
+task :cleanOut do
+  rm_rf DIST_PATH
+end
+
+out_files = Rake::FileList.new("**/*.html", "**/*.mhtml") do |fl|
+  fl.exclude("~*")
+  # fl.exclude(/^scratch\//)
+  # fl.exclude do |f|
+  #   `git ls-files #{f}`.empty?
+  # end
+end
+# msg out_files.ext(".html")
+CLEAN.include(out_files.ext(".html"))
+
+def msg(text)
+  puts " -> msg: #{text}"
 end

@@ -5,6 +5,7 @@
 - [Rake 快速教程](#rake-快速教程)
   - [什么是 Rakefile](#什么是-rakefile)
   - [Rake 常用命令](#rake-常用命令)
+  - [常用 Rakefile 模板](#常用-rakefile-模板)
   - [Rakefile 的基础用法](#rakefile-的基础用法)
   - [File-list](#file-list)
   - [rules](#rules)
@@ -13,6 +14,7 @@
   - [清理构建](#清理构建)
   - [多核构建](#多核构建)
   - [构建依赖](#构建依赖)
+  - [停止构建和问答式执行](#停止构建和问答式执行)
 
 <!-- /TOC -->
 
@@ -32,6 +34,62 @@ $ rake -T
 $ rake -P
 # 打印调试信息 Rakefile
 $ rake -t
+```
+
+## 常用 Rakefile 模板
+
+```ruby
+require 'rake'
+require 'rake/clean'
+require 'pathname'
+Dir.chdir Pathname.getwd()
+
+DIST_PATH=File.join(Pathname.getwd(), 'dist') # set dist path
+
+desc "default task"
+task :default => :html # set default task
+
+source_files = Rake::FileList.new("**/*.md", "**/*.markdown") do |fl|
+  fl.exclude("~*")
+  fl.exclude(/^scratch\//)
+  fl.exclude do |f|
+    `git ls-files #{f}`.empty? # must git add file
+  end
+end
+
+# puts "html in #{source_files.ext(".md")}"
+desc "html task"
+task :html => source_files.ext(".html")
+# multitask :html => source_files.ext(".html") # do multitask
+
+rule ".html" => ".md" do |t|
+  out_folder=File.join(Pathname.getwd(), 'dist')
+  if not File.directory?(DIST_PATH)
+    mkdir_p DIST_PATH
+  end
+  sh "file #{t.source}"
+  out_file=File.join(DIST_PATH, t.name)
+  msg "do out: #{out_file} in: #{t.source}"
+end
+
+desc "clean out folder: outputs"
+task :cleanOut do
+  rm_rf DIST_PATH
+end
+
+out_files = Rake::FileList.new("**/*.html", "**/*.mhtml") do |fl|
+  fl.exclude("~*")
+  # fl.exclude(/^scratch\//)
+  # fl.exclude do |f|
+  #   `git ls-files #{f}`.empty?
+  # end
+end
+# msg out_files.ext(".html")
+CLEAN.include(out_files.ext(".html"))
+
+def msg(text)
+  puts " -> msg: #{text}"
+end
 ```
 
 ## Rakefile 的基础用法
@@ -238,3 +296,41 @@ rake group:all
 这样就可以减少重复任务编写，提高效率
 
 > 注意， 使用了 namespace 分配的任务，那么对 CLOBBER 清理来说，直接作用域就会失效，那么得根据实际情况修改清理任务
+
+## 停止构建和问答式执行
+
+出现可预测的异常，需要停止构建的使用关键字 `abort`, 直接让当前构建退出，并返回错误
+
+```ruby
+abort('error message')
+```
+
+问答式构建则复杂一点，需要函数 ask
+
+```ruby
+def ask(message, valid_options)
+  if valid_options
+    answer = get_stdin("#{message} #{valid_options.to_s.gsub(/"/, '').gsub(/, /,'/')} ") while !valid_options.include?(answer)
+  else
+    answer = get_stdin(message)
+  end
+  answer
+end
+
+def get_stdin(message)
+  print message
+  STDIN.gets.chomp
+end
+```
+
+下面这个例子就是每当输出文件存在时，交互式问是否输入 n 来 打断构建
+
+```ruby
+GEN_FILES = Rake::FileList.new()
+GEN_FILES.each do |t|
+  if File::exists?(t.pathmap("%p"))
+    abort("rake aborted! #{t.pathmap("%p")} not overwrite") if ask("#{t.pathmap("%p")} already exists. Do you want to overwrite?", ['y', 'n']) == 'n'
+  end
+  sh "pandoc -o #{t.pathmap("%p")} #{RES_FILES[each_code]}"
+end
+```

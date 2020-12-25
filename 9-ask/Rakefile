@@ -1,0 +1,59 @@
+require 'rake/clean'
+require 'pathname'
+Dir.chdir Pathname.getwd()
+
+def ask(message, valid_options)
+  if valid_options
+    answer = get_stdin("#{message} #{valid_options.to_s.gsub(/"/, '').gsub(/, /,'/')} ") while !valid_options.include?(answer)
+  else
+    answer = get_stdin(message)
+  end
+  answer
+end
+
+def get_stdin(message)
+  print message
+  STDIN.gets.chomp
+end
+
+desc "default task to html"
+task :default => :html
+
+SOURCE_FILES = Rake::FileList.new("sources/**/*.md", "sources/**/*.markdown") do |fl|
+  fl.exclude("**/~*")
+  fl.exclude(/^sources\/scratch\//)
+  fl.exclude do |f|
+    `git ls-files #{f}`.empty?
+  end
+end
+RES_FILES = SOURCE_FILES.pathmap("%p")
+groupOne_folder = File.join(Pathname.getwd(), "outputs")
+
+desc "use pandoc gen markdown to html at folder #{groupOne_folder}"
+task :html do
+  GEN_FILES = SOURCE_FILES.pathmap("%{^sources/,#{groupOne_folder}/}X.html")
+  each_code = 0
+  GEN_FILES.each do |t|
+    if not File.directory?(t.pathmap("%d"))
+      mkdir_p t.pathmap("%d")
+    end
+    res = RES_FILES[each_code]
+    if File.exists?(res)
+      if File::exists?(t.pathmap("%p"))
+        abort("rake aborted! #{t.pathmap("%p")} not overwrite") if ask("#{t.pathmap("%p")} already exists. Do you want to overwrite?", ['y', 'n']) == 'n'
+      end
+      sh "pandoc -o #{t.pathmap("%p")} #{RES_FILES[each_code]}"
+    end
+    each_code += 1
+  end
+end
+
+out_files = Rake::FileList.new("**/*.html", "**/*.mhtml") do |fl|
+  fl.exclude("~*")
+  # fl.exclude(/^scratch\//)
+  # fl.exclude do |f|
+  #   `git ls-files #{f}`.empty?
+  # end
+end
+
+CLEAN.include(out_files.ext(".html"))
