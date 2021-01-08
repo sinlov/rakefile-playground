@@ -2,10 +2,18 @@
 
 # rakfile playground
 
+## environment
+
+- macOS: 10+
+- ruby: 2.7+
+- rake: 13.0.+
+
+## dev
+
   you must install to run
-- [pandoc](https://pandoc.org/)
-- [kindlegen](https://www.amazon.com/gp/feature.html?docId=1000765211)
-- [calibre cli ebook-convert](https://manual.calibre-ebook.com/generated/en/cli-index.html)
+- [pandoc](https://pandoc.org/) version 2.9.2.1
+- [kindlegen](https://www.amazon.com/gp/feature.html?docId=1000765211) 2.9
+- [calibre cli ebook-convert](https://manual.calibre-ebook.com/generated/en/cli-index.html) 5.6.+
 
 ## document
 

@@ -1,20 +1,22 @@
-# Rake 快速教程
+# Rakefile 快速教程
 
 <!-- TOC -->
 
-- [Rake 快速教程](#rake-快速教程)
+- [Rakefile 快速教程](#rakefile-快速教程)
   - [什么是 Rakefile](#什么是-rakefile)
-  - [Rake 常用命令](#rake-常用命令)
+    - [rake 常用命令](#rake-常用命令)
   - [常用 Rakefile 模板](#常用-rakefile-模板)
-  - [Rakefile 的基础用法](#rakefile-的基础用法)
-  - [File-list](#file-list)
-  - [rules](#rules)
-  - [PathMap](#pathmap)
-  - [文件操作](#文件操作)
-  - [清理构建](#清理构建)
-  - [多核构建](#多核构建)
-  - [构建依赖](#构建依赖)
-  - [停止构建和问答式执行](#停止构建和问答式执行)
+  - [Rakefile 的用法](#rakefile-的用法)
+    - [Rakefile 的基础用法](#rakefile-的基础用法)
+    - [File-list](#file-list)
+    - [rules](#rules)
+    - [PathMap](#pathmap)
+    - [文件操作](#文件操作)
+    - [清理构建](#清理构建)
+    - [多核构建](#多核构建)
+    - [构建依赖](#构建依赖)
+  - [Rakefile 进阶用法](#rakefile-进阶用法)
+    - [停止构建和问答式执行](#停止构建和问答式执行)
 
 <!-- /TOC -->
 
@@ -22,10 +24,9 @@
 
 - Rakefile就是使用Ruby语法的 Makefile, 对应make的工具就是 rake，对应仓库在 [https://github.com/ruby/rake](https://github.com/ruby/rake)
 - Rakefile 在 ruby 构建时充当 task 制定，依赖，执行的媒介
-- 很多框架，比如 [Ruby on Rails](https://github.com/rails/rails) 数据库的初始化, 内容初始化, 删除 ,测试 等等都是 Rakefile 在操作
-- 默认情况下，`rake` 命令会执行当前目录下的 `Rakefile`
+- 很多框架，比如 [Ruby on Rails](https://github.com/rails/rails) 数据库的初始化, 内容初始化, 删除构建 ,测试业务 等等都是 Rakefile 在操作
 
-## Rake 常用命令
+### rake 常用命令
 
 ```bash
 # 打印 Rakefile 所有的任务列表
@@ -34,6 +35,12 @@ $ rake -T
 $ rake -P
 # 打印调试信息 Rakefile
 $ rake -t
+```
+
+- 默认情况下，`rake` 命令会执行当前目录下的 `Rakefile`，也可以指定执行文件
+
+```bash
+rake -f xxxRake.rb
 ```
 
 ## 常用 Rakefile 模板
@@ -92,7 +99,17 @@ def msg(text)
 end
 ```
 
-## Rakefile 的基础用法
+- 可以用命令获取当前模板
+
+```bash
+$ curl -o Rakefile https://raw.githubusercontent.com/sinlov/rakefile-playground/main/document/Rakefile
+```
+
+## Rakefile 的用法
+
+本教程的实例代码在 [https://github.com/sinlov/rakefile-playground](https://github.com/sinlov/rakefile-playground)
+
+### Rakefile 的基础用法
 
 本质上，Rakefile 还是 ruby 脚本，那么肯定包含 ruby 语法，比如打印日志用 `puts`
 
@@ -125,7 +142,7 @@ end
 ```
 表示为: 将对应 markdown 通过 pandoc 编译为 html 文件, 并且如果已经编译过文件则不在编译
 
-## File-list
+### File-list
 
 `Rake::FileList.new()` 用来获取目标文件列表
 
@@ -154,7 +171,7 @@ task :default => :html
 - 排除 `~*` `/^scratch\//`, 以及 git ls-files 为空的文件
 - 生成对应 html 文件
 
-## rules
+### rules
 
 ```ruby
 require 'rake'
@@ -183,7 +200,7 @@ end
 
 > 技巧： 设置 `Rake.application.options.trace_rules = true` 跟踪构建错误
 
-## PathMap
+### PathMap
 
 Rake 修改了 Ruby 的 String 类以便让 FileList 支持特定相同方法
 故，Path 有额外的占位符用来快速操作
@@ -195,7 +212,7 @@ Rake 修改了 Ruby 的 String 类以便让 FileList 支持特定相同方法
 - `%x` 只有扩展名
 - `%X` 排除扩展名
 
-## 文件操作
+### 文件操作
 
 Rakefile 带有常用的文件操作，非常方便操作当前文件
 
@@ -215,7 +232,7 @@ sh [cmd]
 
 > 执行 rake 时使用 `-q` 参数来忽略 sh 执行日志
 
-## 清理构建
+### 清理构建
 
 Rake 提供默认文件清理任务 `rake clean` 此任务使用 `CLEAN.include` 来导入需要清理的文件列表
 
@@ -250,7 +267,7 @@ task :cleanOutPuts do
 end
 ```
 
-## 多核构建
+### 多核构建
 
 默认情况下，Rake 是单核构建的，如果想用到多核构建，把 `task` 换成 `multitask` 比如
 
@@ -268,7 +285,7 @@ $ rake
 $ rake -j 4
 ```
 
-## 构建依赖
+### 构建依赖
 
 针对不同任务，可以做不同的依赖，最常用 namespace 来分割不同的任务
 
@@ -297,7 +314,9 @@ rake group:all
 
 > 注意， 使用了 namespace 分配的任务，那么对 CLOBBER 清理来说，直接作用域就会失效，那么得根据实际情况修改清理任务
 
-## 停止构建和问答式执行
+## Rakefile 进阶用法
+
+### 停止构建和问答式执行
 
 出现可预测的异常，需要停止构建的使用关键字 `abort`, 直接让当前构建退出，并返回错误
 
@@ -334,3 +353,4 @@ GEN_FILES.each do |t|
   sh "pandoc -o #{t.pathmap("%p")} #{RES_FILES[each_code]}"
 end
 ```
+
