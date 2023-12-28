@@ -5,7 +5,7 @@
   - can install by `brew install calibre` and add binary at `$PATH`
 - [kindlegen](https://www.amazon.com/gp/feature.html?docId=1000765211) 2.9
   - known issue [KindleGen is no longer available for download](https://github.com/asciidoctor/asciidoctor-epub3/issues/363)
-  - can use [bin/KindleGen_Mac_x64_v2_9.zip](https://github.com/sinlov/rakefile-playground/main/bin/KindleGen_Mac_x64_v2_9.zip) to replace
+  - can use [bin/KindleGen_Mac_x64_v2_9.zip](https://github.com/sinlov/rakefile-playground/blob/main/bin/KindleGen_Mac_x64_v2_9.zip) to replace
 
 ## run as cli
 
