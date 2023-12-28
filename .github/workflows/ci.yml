@@ -12,6 +12,7 @@ on:
       - 'PU-*'
       - 'DOC-*'
       - 'hotfix-*'
+      - 'fix-*'
     tags:
       - '*' # Push events to matching *, i.e. 1.0.0 v1.0, v20.15.10
   pull_request:
