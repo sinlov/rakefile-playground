@@ -45,6 +45,7 @@ cleanAll: cleanGemCache
 
 installGlobal:
 	gem install --user-install bundler
+	brew install pandoc
 	# gem install --user-install pygmentize
 
 install:

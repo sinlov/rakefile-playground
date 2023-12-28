@@ -34,7 +34,7 @@ namespace :groupOne do |ns|
       GEN_FILES.each do |t|
         mkdir_p t.pathmap("%d")
         res = RES_FILES[each_code]
-        if File::exists?(res)
+        if File::exist?(res)
           sh "pandoc -o #{t.pathmap("%p")} #{RES_FILES[each_code]}"
           # CLOBBER << t.pathmap("%p")
         end
@@ -52,7 +52,7 @@ namespace :groupOne do |ns|
       GEN_FILES.each do |t|
         mkdir_p t.pathmap("%d")
         res = RES_FILES[each_code]
-        if File::exists?(res)
+        if File::exist?(res)
           sh "pandoc -o #{t.pathmap("%p")} #{RES_FILES[each_code]}"
           # CLOBBER << t.pathmap("%p")
         end
@@ -66,7 +66,7 @@ namespace :groupOne do |ns|
 end
 
 namespace :groupTwo do
-  # desc "group one, pandoc to folder outputs/one/"
+  # desc "group two, pandoc to folder outputs/two/"
   groupTwo_folder = File.join("outputs", "two")
 
   desc "group two, pandoc to folder #{groupTwo_folder}"
@@ -77,7 +77,7 @@ namespace :groupTwo do
     GEN_FILES.each do |t|
       mkdir_p t.pathmap("%d")
       res = RES_FILES[each_code]
-      if File::exists?(res)
+      if File::exist?(res)
         sh "pandoc -o #{t.pathmap("%p")} #{RES_FILES[each_code]}"
       end
       each_code += 1

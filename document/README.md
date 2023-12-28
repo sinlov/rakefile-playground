@@ -347,7 +347,7 @@ end
 ```ruby
 GEN_FILES = Rake::FileList.new()
 GEN_FILES.each do |t|
-  if File::exists?(t.pathmap("%p"))
+  if File::exist?(t.pathmap("%p"))
     abort("rake aborted! #{t.pathmap("%p")} not overwrite") if ask("#{t.pathmap("%p")} already exists. Do you want to overwrite?", ['y', 'n']) == 'n'
   end
   sh "pandoc -o #{t.pathmap("%p")} #{RES_FILES[each_code]}"

@@ -8,10 +8,7 @@
 name: ruby-macOS
 
 on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+  workflow_call: # https://docs.github.com/actions/using-workflows/reusing-workflows#using-inputs-and-secrets-in-a-reusable-workflow
 
 jobs:
   test:
@@ -19,14 +16,14 @@ jobs:
     runs-on: macos-latest
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
     - name: Set up Ruby
     # To automatically get bug fixes and new Ruby versions for ruby/setup-ruby,
     # change this to (see https://github.com/ruby/setup-ruby#versioning):
     # uses: ruby/setup-ruby@v1
       uses: ruby/setup-ruby@21351ecc0a7c196081abca5dc55b08f085efe09a
       with:
-        ruby-version: 2.7.2
+        ruby-version: 3.2.2
     - name: Install Tools
       run: |
        brew install pandoc
