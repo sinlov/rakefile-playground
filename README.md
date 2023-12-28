@@ -1,4 +1,4 @@
-[![ruby-macOS](https://github.com/sinlov/rakefile-playground/workflows/ruby-macOS/badge.svg?branch=main)](https://github.com/sinlov/rakefile-playground/actions)
+[![ci](https://github.com/sinlov/rakefile-playground/actions/workflows/ci.yml/badge.svg)](https://github.com/sinlov/rakefile-playground/actions/workflows/ci.yml)
 
 [![GitHub license](https://img.shields.io/github/license/sinlov/rakefile-playground)](https://github.com/sinlov/rakefile-playground)
 [![GitHub latest SemVer tag)](https://img.shields.io/github/v/tag/sinlov/rakefile-playground)](https://github.com/sinlov/rakefile-playground/tags)
